@@ -130,6 +130,7 @@ export function StokSayfasi() {
                   <td>
                     <input
                       type="number"
+                      placeholder="Miktar"
                       value={urun.quantity}
                       onChange={(e) =>
                         stokMiktarGuncelle(

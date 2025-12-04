@@ -1,6 +1,3 @@
--- PostgreSQL init script - runs automatically on first database initialization
--- Note: Database 'fitness' is already created by POSTGRES_DB environment variable
-
 CREATE TABLE IF NOT EXISTS yoneticiler (
     id SERIAL PRIMARY KEY,
     eposta VARCHAR(255) NOT NULL UNIQUE,
@@ -45,21 +42,47 @@ CREATE TABLE IF NOT EXISTS ekipmanlar (
 );
 
 -- Insert default admin only if it doesn't exist
-INSERT INTO yoneticiler (eposta, sifre) 
+INSERT INTO
+    yoneticiler (eposta, sifre)
 SELECT 'admin@admin.com', '123456'
-WHERE NOT EXISTS (SELECT 1 FROM yoneticiler WHERE eposta = 'admin@admin.com');
+WHERE
+    NOT EXISTS (
+        SELECT 1
+        FROM yoneticiler
+        WHERE
+            eposta = 'admin@admin.com'
+    );
 
 -- Insert default stock items only if they don't exist
-INSERT INTO stok_urunleri (ad, miktar, min_miktar) 
+INSERT INTO
+    stok_urunleri (ad, miktar, min_miktar)
 SELECT 'Protein Tozu', 10, 3
-WHERE NOT EXISTS (SELECT 1 FROM stok_urunleri WHERE ad = 'Protein Tozu');
+WHERE
+    NOT EXISTS (
+        SELECT 1
+        FROM stok_urunleri
+        WHERE
+            ad = 'Protein Tozu'
+    );
 
-INSERT INTO stok_urunleri (ad, miktar, min_miktar) 
+INSERT INTO
+    stok_urunleri (ad, miktar, min_miktar)
 SELECT 'Kreatin', 8, 2
-WHERE NOT EXISTS (SELECT 1 FROM stok_urunleri WHERE ad = 'Kreatin');
+WHERE
+    NOT EXISTS (
+        SELECT 1
+        FROM stok_urunleri
+        WHERE
+            ad = 'Kreatin'
+    );
 
-INSERT INTO stok_urunleri (ad, miktar, min_miktar) 
+INSERT INTO
+    stok_urunleri (ad, miktar, min_miktar)
 SELECT 'BCAA', 5, 2
-WHERE NOT EXISTS (SELECT 1 FROM stok_urunleri WHERE ad = 'BCAA');
-
-
+WHERE
+    NOT EXISTS (
+        SELECT 1
+        FROM stok_urunleri
+        WHERE
+            ad = 'BCAA'
+    );
