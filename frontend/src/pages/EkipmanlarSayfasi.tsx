@@ -93,6 +93,7 @@ export function EkipmanlarSayfasi() {
           />
           <input
             type="date"
+            placeholder="ekipman"
             value={yeniEkipman.sonBakimTarihi}
             onChange={(e) =>
               setYeniEkipman({ ...yeniEkipman, sonBakimTarihi: e.target.value })

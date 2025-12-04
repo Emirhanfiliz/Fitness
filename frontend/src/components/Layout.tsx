@@ -11,7 +11,6 @@ export function AnaLayout({ onLogout }: AnaLayoutProps) {
     <div className="layout">
       <aside className="sidebar">
         <div>
-          <h2>Fitness Panel</h2>
           <div className="nav-buttons">
             <Link
               to="/anasayfa"
