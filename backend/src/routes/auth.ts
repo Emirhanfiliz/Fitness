@@ -39,7 +39,7 @@ authRouter.post("/login", async (req, res) => {
   return res.json({ token });
 });
 
-// QR kod token'ı oluştur (her 5 saniyede bir yenilenir)
+// QR kod token'ı oluştur (her 1 dakikada bir yenilenir)
 authRouter.get("/qr-token", async (req, res) => {
   // Eski token'ları temizle
   const now = Date.now();
@@ -49,13 +49,13 @@ authRouter.get("/qr-token", async (req, res) => {
     }
   }
 
-  // Yeni token oluştur (10 saniye geçerli)
+  // Yeni token oluştur (60 saniye geçerli)
   const token = crypto.randomBytes(32).toString("hex");
   qrTokens.set(token, {
-    expiresAt: now + 10000, // 10 saniye
+    expiresAt: now + 60000, // 60 saniye (1 dakika)
   });
 
-  return res.json({ token, expiresIn: 10 });
+  return res.json({ token, expiresIn: 60 });
 });
 
 // QR kod ile giriş (şifre kontrolü ile)

@@ -46,7 +46,7 @@ export function AnaSayfa() {
     })();
   }, [token]);
 
-  // QR kod token'ını her 5 saniyede bir yenile
+  // QR kod token'ını her 1 dakikada bir yenile
   useEffect(() => {
     async function updateQrCode() {
       try {
@@ -60,7 +60,7 @@ export function AnaSayfa() {
     }
 
     updateQrCode();
-    const interval = setInterval(updateQrCode, 5000); // Her 5 saniyede bir
+    const interval = setInterval(updateQrCode, 60000); // Her 1 dakikada bir
 
     return () => clearInterval(interval);
   }, []);
@@ -123,7 +123,7 @@ export function AnaSayfa() {
                 </div>
               )}
               <p style={{ fontSize: "0.9rem", color: "#666" }}>
-                Bu QR kodu okutarak giriş yapabilirsiniz. Kod her 5 saniyede bir yenilenir.
+                Bu QR kodu okutarak giriş yapabilirsiniz. Kod her 1 dakikada bir yenilenir.
               </p>
             </div>
           </section>
