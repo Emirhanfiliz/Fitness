@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GirisSayfasi } from "./pages/GirisSayfasi";
+import { QrGirisSayfasi } from "./pages/QrGirisSayfasi";
 import { AnaLayout } from "./components/Layout";
 import { AnaSayfa } from "./pages/AnaSayfa";
 import { StokSayfasi } from "./pages/StokSayfasi";
@@ -39,6 +40,7 @@ export function App() {
             )
           }
         />
+        <Route path="/qr-giris" element={<QrGirisSayfasi />} />
         <Route
           path="/"
           element={

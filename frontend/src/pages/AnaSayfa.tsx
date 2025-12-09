@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import {
   fetchDashboard,
   fetchMembers,
   createMember,
   deleteMember,
+  getQrToken,
 } from "../api";
 
 type AnaSayfaVerisi = {
@@ -25,6 +27,7 @@ export function AnaSayfa() {
     phone: "",
     durationMonths: 1,
   });
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
 
   useEffect(() => {
     if (!token) return;
@@ -41,6 +44,25 @@ export function AnaSayfa() {
       }
     })();
   }, [token]);
+
+  // QR kod token'ını her 5 saniyede bir yenile
+  useEffect(() => {
+    async function updateQrCode() {
+      try {
+        const { token: qrToken } = await getQrToken();
+        const baseUrl = window.location.origin;
+        const qrUrl = `${baseUrl}/qr-giris?token=${qrToken}`;
+        setQrCodeUrl(qrUrl);
+      } catch (e: any) {
+        console.error("QR kod alınamadı:", e);
+      }
+    }
+
+    updateQrCode();
+    const interval = setInterval(updateQrCode, 5000); // Her 5 saniyede bir
+
+    return () => clearInterval(interval);
+  }, []);
 
   async function uyeOlustur(e: React.FormEvent) {
     e.preventDefault();
@@ -90,6 +112,20 @@ export function AnaSayfa() {
               <p>%{anaSayfaVerisi.occupancyRate}</p>
             </div>
           </div>
+
+          <section className="section">
+            <h2>QR Kod (Üye Girişi)</h2>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
+              {qrCodeUrl && (
+                <div style={{ padding: "1rem", backgroundColor: "white", borderRadius: "8px", display: "inline-block" }}>
+                  <QRCodeSVG value={qrCodeUrl} size={256} />
+                </div>
+              )}
+              <p style={{ fontSize: "0.9rem", color: "#666" }}>
+                Bu QR kodu okutarak giriş yapabilirsiniz. Kod her 5 saniyede bir yenilenir.
+              </p>
+            </div>
+          </section>
 
           <section className="section">
             <h2>Aylık Üye Grafiği</h2>

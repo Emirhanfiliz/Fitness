@@ -1,8 +1,12 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import { pool } from "../database";
+import crypto from "crypto";
 
 export const authRouter = Router();
+
+// QR kod token'larını saklamak için geçici depo (production'da Redis kullanılmalı)
+const qrTokens = new Map<string, { expiresAt: number }>();
 
 authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -33,4 +37,62 @@ authRouter.post("/login", async (req, res) => {
   );
 
   return res.json({ token });
+});
+
+// QR kod token'ı oluştur (her 5 saniyede bir yenilenir)
+authRouter.get("/qr-token", async (req, res) => {
+  // Eski token'ları temizle
+  const now = Date.now();
+  for (const [token, data] of qrTokens.entries()) {
+    if (data.expiresAt < now) {
+      qrTokens.delete(token);
+    }
+  }
+
+  // Yeni token oluştur (10 saniye geçerli)
+  const token = crypto.randomBytes(32).toString("hex");
+  qrTokens.set(token, {
+    expiresAt: now + 10000, // 10 saniye
+  });
+
+  return res.json({ token, expiresIn: 10 });
+});
+
+// QR kod ile giriş (şifre kontrolü ile)
+authRouter.post("/qr-login", async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    return res.status(400).json({ message: "Token ve şifre zorunlu" });
+  }
+
+  // Token'ın geçerli olup olmadığını kontrol et
+  const tokenData = qrTokens.get(token);
+  if (!tokenData) {
+    return res.status(401).json({ message: "Geçersiz veya süresi dolmuş QR kod" });
+  }
+
+  if (tokenData.expiresAt < Date.now()) {
+    qrTokens.delete(token);
+    return res.status(401).json({ message: "QR kod süresi dolmuş" });
+  }
+
+  // Şifreyi kontrol et (üye şifresi olarak admin şifresini kullanıyoruz)
+  const result = await pool.query(
+    "SELECT id, eposta, sifre FROM yoneticiler LIMIT 1"
+  );
+
+  if (result.rows.length === 0) {
+    return res.status(500).json({ message: "Sistem hatası" });
+  }
+
+  const admin = result.rows[0];
+  if (admin.sifre !== password) {
+    return res.status(401).json({ message: "Geçersiz şifre" });
+  }
+
+  // Token'ı kullanıldığı için sil
+  qrTokens.delete(token);
+
+  return res.json({ success: true, message: "Giriş başarılı" });
 });

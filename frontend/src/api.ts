@@ -197,4 +197,23 @@ export async function bakimYap(token: string, id: number, bakimAraligiAy: number
   return res.json();
 }
 
+export async function getQrToken() {
+  const res = await fetch(`${API_BASE}/auth/qr-token`);
+  if (!res.ok) throw new Error("QR token alınamadı");
+  return res.json() as Promise<{ token: string; expiresIn: number }>;
+}
+
+export async function qrLogin(token: string, password: string) {
+  const res = await fetch(`${API_BASE}/auth/qr-login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Giriş başarısız");
+  }
+  return res.json() as Promise<{ success: boolean; message: string }>;
+}
+
 
