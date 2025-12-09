@@ -7,8 +7,8 @@ export const adminRouter = Router();
 adminRouter.use(authMiddleware);
 
 adminRouter.post("/members", async (req, res) => {
-  const { name, email, phone, durationMonths } = req.body;
-  if (!name || !email || !phone || !durationMonths) {
+  const { name, email, phone, password, durationMonths } = req.body;
+  if (!name || !email || !phone || !password || !durationMonths) {
     return res
       .status(400)
       .json({ message: "Tüm alanlar zorunludur" });
@@ -26,8 +26,8 @@ adminRouter.post("/members", async (req, res) => {
   end.setMonth(end.getMonth() + months);
 
   const result = await pool.query(
-    'INSERT INTO uyeler (ad, eposta, telefon, uyelik_bitis_tarihi) VALUES ($1, $2, $3, $4) RETURNING id, ad as name, eposta as email, telefon as phone, uyelik_bitis_tarihi as "membershipEnd", olusturma_tarihi as "createdAt"',
-    [name, email, phone, end]
+    'INSERT INTO uyeler (ad, eposta, telefon, sifre, uyelik_bitis_tarihi) VALUES ($1, $2, $3, $4, $5) RETURNING id, ad as name, eposta as email, telefon as phone, uyelik_bitis_tarihi as "membershipEnd", olusturma_tarihi as "createdAt"',
+    [name, email, phone, password, end]
   );
 
   return res.status(201).json(result.rows[0]);

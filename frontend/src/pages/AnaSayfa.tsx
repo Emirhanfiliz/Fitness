@@ -25,6 +25,7 @@ export function AnaSayfa() {
     name: "",
     email: "",
     phone: "",
+    password: "",
     durationMonths: 1,
   });
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
@@ -70,7 +71,7 @@ export function AnaSayfa() {
     try {
       const olusturulan = await createMember(token, yeniUye);
       setUyeler((onceki) => [olusturulan, ...onceki]);
-      setYeniUye({ name: "", email: "", phone: "", durationMonths: 1 });
+      setYeniUye({ name: "", email: "", phone: "", password: "", durationMonths: 1 });
       const guncelVeri = await fetchDashboard(token);
       setAnaSayfaVerisi(guncelVeri);
     } catch (e: any) {
@@ -177,6 +178,15 @@ export function AnaSayfa() {
             value={yeniUye.phone}
             onChange={(e) =>
               setYeniUye({ ...yeniUye, phone: e.target.value })
+            }
+            required
+          />
+          <input
+            type="password"
+            placeholder="Şifre"
+            value={yeniUye.password}
+            onChange={(e) =>
+              setYeniUye({ ...yeniUye, password: e.target.value })
             }
             required
           />

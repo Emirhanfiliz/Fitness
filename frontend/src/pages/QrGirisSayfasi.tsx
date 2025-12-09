@@ -6,6 +6,7 @@ export function QrGirisSayfasi() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token");
+  const [email, setEmail] = useState("");
   const [sifre, setSifre] = useState("");
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState<string | null>(null);
@@ -28,7 +29,7 @@ export function QrGirisSayfasi() {
     setHata(null);
 
     try {
-      await qrLogin(token, sifre);
+      await qrLogin(token, email, sifre);
       setBasari(true);
       setTimeout(() => {
         // Başarılı girişten sonra ana sayfaya yönlendir veya başka bir sayfa göster
@@ -68,9 +69,19 @@ export function QrGirisSayfasi() {
       <div className="auth-card">
         <h1>Üye Girişi</h1>
         <p style={{ marginBottom: "1.5rem", color: "#666" }}>
-          QR kodu okuttunuz. Lütfen şifrenizi girin.
+          QR kodu okuttunuz. Lütfen e-posta ve şifrenizi girin.
         </p>
         <form onSubmit={girisYap} className="form">
+          <label>
+            E-posta
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoFocus
+            />
+          </label>
           <label>
             Şifre
             <input
@@ -78,7 +89,6 @@ export function QrGirisSayfasi() {
               value={sifre}
               onChange={(e) => setSifre(e.target.value)}
               required
-              autoFocus
             />
           </label>
           {hata && <div className="error">{hata}</div>}

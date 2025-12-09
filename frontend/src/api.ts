@@ -31,7 +31,7 @@ export async function fetchMembers(token: string) {
 
 export async function createMember(
   token: string,
-  data: { name: string; email: string; phone: string; durationMonths: number }
+  data: { name: string; email: string; phone: string; password: string; durationMonths: number }
 ) {
   const res = await fetch(`${API_BASE}/admin/members`, {
     method: "POST",
@@ -203,17 +203,17 @@ export async function getQrToken() {
   return res.json() as Promise<{ token: string; expiresIn: number }>;
 }
 
-export async function qrLogin(token: string, password: string) {
+export async function qrLogin(token: string, email: string, password: string) {
   const res = await fetch(`${API_BASE}/auth/qr-login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, password }),
+    body: JSON.stringify({ token, email, password }),
   });
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.message || "Giriş başarısız");
   }
-  return res.json() as Promise<{ success: boolean; message: string }>;
+  return res.json() as Promise<{ success: boolean; message: string; member?: any }>;
 }
 
 

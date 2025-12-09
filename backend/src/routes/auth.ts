@@ -60,10 +60,10 @@ authRouter.get("/qr-token", async (req, res) => {
 
 // QR kod ile giriş (şifre kontrolü ile)
 authRouter.post("/qr-login", async (req, res) => {
-  const { token, password } = req.body;
+  const { token, password, email } = req.body;
 
-  if (!token || !password) {
-    return res.status(400).json({ message: "Token ve şifre zorunlu" });
+  if (!token || !password || !email) {
+    return res.status(400).json({ message: "Token, email ve şifre zorunlu" });
   }
 
   // Token'ın geçerli olup olmadığını kontrol et
@@ -77,22 +77,40 @@ authRouter.post("/qr-login", async (req, res) => {
     return res.status(401).json({ message: "QR kod süresi dolmuş" });
   }
 
-  // Şifreyi kontrol et (üye şifresi olarak admin şifresini kullanıyoruz)
+  // Üyeyi email ile bul ve şifresini kontrol et
   const result = await pool.query(
-    "SELECT id, eposta, sifre FROM yoneticiler LIMIT 1"
+    "SELECT id, ad, eposta, sifre, uyelik_bitis_tarihi FROM uyeler WHERE eposta = $1",
+    [email]
   );
 
   if (result.rows.length === 0) {
-    return res.status(500).json({ message: "Sistem hatası" });
+    return res.status(401).json({ message: "Üye bulunamadı" });
   }
 
-  const admin = result.rows[0];
-  if (admin.sifre !== password) {
+  const uye = result.rows[0];
+  
+  // Üyelik süresinin dolup dolmadığını kontrol et
+  const uyelikBitisTarihi = new Date(uye.uyelik_bitis_tarihi);
+  const simdi = new Date();
+  if (uyelikBitisTarihi < simdi) {
+    return res.status(401).json({ message: "Üyelik süreniz dolmuş" });
+  }
+
+  // Şifreyi kontrol et
+  if (uye.sifre !== password) {
     return res.status(401).json({ message: "Geçersiz şifre" });
   }
 
   // Token'ı kullanıldığı için sil
   qrTokens.delete(token);
 
-  return res.json({ success: true, message: "Giriş başarılı" });
+  return res.json({ 
+    success: true, 
+    message: "Giriş başarılı",
+    member: {
+      id: uye.id,
+      name: uye.ad,
+      email: uye.eposta
+    }
+  });
 });

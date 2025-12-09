@@ -39,10 +39,22 @@ async function initializeTables() {
         ad VARCHAR(255) NOT NULL,
         eposta VARCHAR(255) NOT NULL,
         telefon VARCHAR(255) NOT NULL,
+        sifre VARCHAR(255) NOT NULL,
         uyelik_bitis_tarihi DATE NOT NULL,
         olusturma_tarihi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Mevcut tablolara şifre kolonu ekle (eğer yoksa)
+    try {
+      await pool.query(`
+        ALTER TABLE uyeler 
+        ADD COLUMN IF NOT EXISTS sifre VARCHAR(255) NOT NULL DEFAULT '123456'
+      `);
+    } catch (err) {
+      // Kolon zaten varsa hata vermez, devam et
+      console.log("Şifre kolonu zaten mevcut veya eklenemedi:", err);
+    }
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS stok_urunleri (

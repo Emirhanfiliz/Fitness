@@ -11,9 +11,14 @@ CREATE TABLE IF NOT EXISTS uyeler (
     ad VARCHAR(255) NOT NULL,
     eposta VARCHAR(255) NOT NULL,
     telefon VARCHAR(255) NOT NULL,
+    sifre VARCHAR(255) NOT NULL,
     uyelik_bitis_tarihi DATE NOT NULL,
     olusturma_tarihi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Mevcut tablolara şifre kolonu ekle (eğer yoksa)
+ALTER TABLE uyeler 
+ADD COLUMN IF NOT EXISTS sifre VARCHAR(255) NOT NULL DEFAULT '123456';
 
 CREATE TABLE IF NOT EXISTS stok_urunleri (
     id SERIAL PRIMARY KEY,
