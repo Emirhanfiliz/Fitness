@@ -123,13 +123,14 @@ adminRouter.get("/analytics/logins", async (req, res) => {
 
   const hourly = await pool.query(
     `
-    SELECT
-      EXTRACT(HOUR FROM (olusturma_tarihi AT TIME ZONE 'Europe/Istanbul'))::int as hour,
-      COUNT(*)::int as count
-    FROM giris_loglari
-    WHERE olusturma_tarihi >= $1
-    GROUP BY hour
-    ORDER BY hour
+   SELECT
+  EXTRACT(HOUR FROM olusturma_tarihi)::int AS hour,
+  COUNT(*)::int AS count
+FROM giris_loglari
+WHERE olusturma_tarihi >= $1
+GROUP BY hour
+ORDER BY hour;
+
   `,
     [startDate]
   );
