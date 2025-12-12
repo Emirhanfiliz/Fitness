@@ -8,97 +8,25 @@ type LoginAnalytics = {
   hourly: { hour: number; count: number }[];
 };
 
-type LineChartProps = {
-  data: { label: string; value: number }[];
-  width?: number;
-  height?: number;
-};
-
-function LineChart({ data, width = 620, height = 220 }: LineChartProps) {
-  if (!data.length) return <p>Veri yok</p>;
-  const max = Math.max(...data.map((d) => d.value), 1);
-  const stepX = data.length > 1 ? width / (data.length - 1) : 0;
-
-  const points =
-    data.length === 1
-      ? (() => {
-          const y =
-            height - (data[0].value / max) * (height - 20);
-          const cx = width / 2;
-          return [`${cx - 10},${y}`, `${cx + 10},${y}`];
-        })()
-      : data.map((d, i) => {
-          const x = i * stepX;
-          const y = height - (d.value / max) * (height - 20);
-          return `${x},${y}`;
-        });
-
-  const maxLabelCount = Math.min(8, data.length);
-  const labelStep = Math.max(1, Math.floor(data.length / maxLabelCount));
-
-  return (
-    <div style={{ width: width + 20 }}>
-      <svg width={width} height={height} style={{ background: "#f7f9fc", borderRadius: 8 }}>
-        <polyline
-          fill="none"
-          stroke="#3b82f6"
-          strokeWidth="3"
-          points={points.join(" ")}
-        />
-        {data.map((d, i) => {
-          const x = data.length > 1 ? i * stepX : width / 2;
-          const y = height - (d.value / max) * (height - 20);
-          return <circle key={i} cx={x} cy={y} r={3.5} fill="#1d4ed8" />;
-        })}
-      </svg>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: data.length === 1 ? "center" : "space-between",
-          fontSize: 12,
-          color: "#555",
-          marginTop: 6,
-        }}
-      >
-        {data.map((d, i) => {
-          if (i % labelStep !== 0 && i !== data.length - 1) return null;
-          return (
-            <span key={i} style={{ whiteSpace: "nowrap" }}>
-              {d.label}
-            </span>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function VerticalBars({
+function HorizontalBars({
   data,
-  height = 180,
 }: {
   data: { label: string; value: number }[];
-  height?: number;
 }) {
   if (!data.length) return <p>Veri yok</p>;
   const max = Math.max(...data.map((d) => d.value), 1);
 
   return (
-    <div style={{ display: "flex", gap: 6, alignItems: "flex-end", minHeight: height }}>
+    <div className="chart-placeholder">
       {data.map((d) => {
-        const h = Math.max(8, (d.value / max) * height);
+        const width = Math.max(10, (d.value / max) * 240);
         return (
-          <div key={d.label} style={{ textAlign: "center", width: 20 }}>
-            <div
-              style={{
-                height: h,
-                background: "#10b981",
-                borderRadius: 4,
-                transition: "height 0.2s",
-              }}
-              title={`${d.label}: ${d.value}`}
-            />
-            <div style={{ fontSize: 11, marginTop: 4 }}>{d.label}</div>
+          <div key={d.label} className="chart-row">
+            <span>{d.label}</span>
+            <div className="bar">
+              <div className="bar-fill" style={{ width: `${width}px` }} />
+            </div>
+            <span>{d.value}</span>
           </div>
         );
       })}
@@ -188,7 +116,7 @@ export function RaporlarSayfasi() {
               <h2>Günlük Girişler</h2>
               <span style={{ color: "#555" }}>Toplam: {dailyTotal}</span>
             </div>
-            <LineChart data={dailyData} />
+            <HorizontalBars data={dailyData} />
           </section>
 
           <section className="section">
@@ -196,7 +124,7 @@ export function RaporlarSayfasi() {
               <h2>Aylık Girişler</h2>
               <span style={{ color: "#555" }}>Toplam: {monthlyTotal}</span>
             </div>
-            <LineChart data={monthlyData} />
+            <HorizontalBars data={monthlyData} />
           </section>
 
           <section className="section">
@@ -204,7 +132,7 @@ export function RaporlarSayfasi() {
               <h2>En Yoğun Saatler</h2>
               <span style={{ color: "#555" }}>Toplam: {hourlyTotal}</span>
             </div>
-            <VerticalBars data={hourlyData} />
+            <HorizontalBars data={hourlyData} />
           </section>
         </>
       )}
