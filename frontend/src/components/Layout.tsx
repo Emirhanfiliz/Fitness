@@ -33,6 +33,16 @@ export function AnaLayout({ onLogout }: AnaLayoutProps) {
               QR Kod
             </Link>
             <Link
+              to="/raporlar"
+              className={
+                location.pathname === "/raporlar"
+                  ? "nav-btn active"
+                  : "nav-btn"
+              }
+            >
+              Raporlar
+            </Link>
+            <Link
               to="/stok"
               className={
                 location.pathname === "/stok" ? "nav-btn active" : "nav-btn"

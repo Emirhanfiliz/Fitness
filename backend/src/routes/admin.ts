@@ -87,6 +87,44 @@ adminRouter.get("/dashboard", async (_req, res) => {
   });
 });
 
+adminRouter.get("/analytics/logins", async (_req, res) => {
+  const weekly = await pool.query(`
+    SELECT
+      to_char(olusturma_tarihi, 'YYYY-MM-DD') as day,
+      COUNT(*)::int as count
+    FROM giris_loglari
+    WHERE olusturma_tarihi >= NOW() - INTERVAL '7 days'
+    GROUP BY day
+    ORDER BY day
+  `);
+
+  const monthly = await pool.query(`
+    SELECT
+      to_char(olusturma_tarihi, 'YYYY-MM') as month,
+      COUNT(*)::int as count
+    FROM giris_loglari
+    WHERE olusturma_tarihi >= date_trunc('month', NOW()) - INTERVAL '6 months'
+    GROUP BY month
+    ORDER BY month
+  `);
+
+  const hourly = await pool.query(`
+    SELECT
+      EXTRACT(HOUR FROM olusturma_tarihi)::int as hour,
+      COUNT(*)::int as count
+    FROM giris_loglari
+    WHERE olusturma_tarihi >= NOW() - INTERVAL '30 days'
+    GROUP BY hour
+    ORDER BY hour
+  `);
+
+  return res.json({
+    weekly: weekly.rows,
+    monthly: monthly.rows,
+    hourly: hourly.rows,
+  });
+});
+
 adminRouter.get("/stock", async (_req, res) => {
   const result = await pool.query("SELECT id, ad as name, miktar as quantity, min_miktar as \"minQuantity\" FROM stok_urunleri");
   return res.json(result.rows);

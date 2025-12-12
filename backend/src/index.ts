@@ -87,6 +87,15 @@ async function initializeTables() {
         durum VARCHAR(255) NOT NULL DEFAULT 'Aktif'
       )
     `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS giris_loglari (
+        id SERIAL PRIMARY KEY,
+        uye_id INTEGER REFERENCES uyeler(id) ON DELETE SET NULL,
+        yontem VARCHAR(50) NOT NULL,
+        olusturma_tarihi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
   } catch (err) {
     console.error("Error initializing tables:", err);
     throw err;

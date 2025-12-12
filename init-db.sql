@@ -46,7 +46,14 @@ CREATE TABLE IF NOT EXISTS ekipmanlar (
     durum VARCHAR(255) NOT NULL DEFAULT 'Aktif'
 );
 
--- Insert default admin only if it doesn't exist
+CREATE TABLE IF NOT EXISTS giris_loglari (
+    id SERIAL PRIMARY KEY,
+    uye_id INTEGER REFERENCES uyeler(id) ON DELETE SET NULL,
+    yontem VARCHAR(50) NOT NULL,
+    olusturma_tarihi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 INSERT INTO
     yoneticiler (eposta, sifre)
 SELECT 'admin@admin.com', '123456'

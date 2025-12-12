@@ -101,7 +101,17 @@ authRouter.post("/qr-login", async (req, res) => {
     return res.status(401).json({ message: "Geçersiz şifre" });
   }
 
-  // Token'ı kullanıldığı için sil
+
+  try {
+    await pool.query(
+      "INSERT INTO giris_loglari (uye_id, yontem) VALUES ($1, $2)",
+      [uye.id, "qr"]
+    );
+  } catch (err) {
+    console.error("Giriş logu kaydedilemedi", err);
+  }
+
+ 
   qrTokens.delete(token);
 
   return res.json({ 
