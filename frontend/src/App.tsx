@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GirisSayfasi } from "./pages/GirisSayfasi";
 import { QrGirisSayfasi } from "./pages/QrGirisSayfasi";
+import { QrKodSayfasi } from "./pages/QrKodSayfasi";
 import { AnaLayout } from "./components/Layout";
 import { AnaSayfa } from "./pages/AnaSayfa";
 import { StokSayfasi } from "./pages/StokSayfasi";
@@ -51,6 +52,7 @@ export function App() {
         >
           <Route index element={<Navigate to="/anasayfa" replace />} />
           <Route path="anasayfa" element={<AnaSayfa />} />
+          <Route path="qr-kod" element={<QrKodSayfasi />} />
           <Route path="stok" element={<StokSayfasi />} />
           <Route path="calisanlar" element={<CalisanlarSayfasi />} />
           <Route path="ekipmanlar" element={<EkipmanlarSayfasi />} />

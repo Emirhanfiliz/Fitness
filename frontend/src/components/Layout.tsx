@@ -23,6 +23,16 @@ export function AnaLayout({ onLogout }: AnaLayoutProps) {
               Ana Sayfa
             </Link>
             <Link
+              to="/qr-kod"
+              className={
+                location.pathname === "/qr-kod"
+                  ? "nav-btn active"
+                  : "nav-btn"
+              }
+            >
+              QR Kod
+            </Link>
+            <Link
               to="/stok"
               className={
                 location.pathname === "/stok" ? "nav-btn active" : "nav-btn"
