@@ -19,11 +19,19 @@ function LineChart({ data, width = 620, height = 220 }: LineChartProps) {
   const max = Math.max(...data.map((d) => d.value), 1);
   const stepX = data.length > 1 ? width / (data.length - 1) : 0;
 
-  const points = data.map((d, i) => {
-    const x = i * stepX;
-    const y = height - (d.value / max) * (height - 20);
-    return `${x},${y}`;
-  });
+  const points =
+    data.length === 1
+      ? (() => {
+          const y =
+            height - (data[0].value / max) * (height - 20);
+          const cx = width / 2;
+          return [`${cx - 10},${y}`, `${cx + 10},${y}`];
+        })()
+      : data.map((d, i) => {
+          const x = i * stepX;
+          const y = height - (d.value / max) * (height - 20);
+          return `${x},${y}`;
+        });
 
   const maxLabelCount = Math.min(8, data.length);
   const labelStep = Math.max(1, Math.floor(data.length / maxLabelCount));
@@ -38,7 +46,7 @@ function LineChart({ data, width = 620, height = 220 }: LineChartProps) {
           points={points.join(" ")}
         />
         {data.map((d, i) => {
-          const x = i * stepX;
+          const x = data.length > 1 ? i * stepX : width / 2;
           const y = height - (d.value / max) * (height - 20);
           return <circle key={i} cx={x} cy={y} r={3.5} fill="#1d4ed8" />;
         })}
@@ -46,7 +54,7 @@ function LineChart({ data, width = 620, height = 220 }: LineChartProps) {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: data.length === 1 ? "center" : "space-between",
           fontSize: 12,
           color: "#555",
           marginTop: 6,
@@ -143,6 +151,19 @@ export function RaporlarSayfasi() {
     [veri]
   );
 
+  const dailyTotal = useMemo(
+    () => dailyData.reduce((sum, d) => sum + d.value, 0),
+    [dailyData]
+  );
+  const monthlyTotal = useMemo(
+    () => monthlyData.reduce((sum, d) => sum + d.value, 0),
+    [monthlyData]
+  );
+  const hourlyTotal = useMemo(
+    () => hourlyData.reduce((sum, d) => sum + d.value, 0),
+    [hourlyData]
+  );
+
   return (
     <>
       <h1>Raporlar</h1>
@@ -163,17 +184,26 @@ export function RaporlarSayfasi() {
       {veri && (
         <>
           <section className="section">
-            <h2>Günlük Girişler</h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2>Günlük Girişler</h2>
+              <span style={{ color: "#555" }}>Toplam: {dailyTotal}</span>
+            </div>
             <LineChart data={dailyData} />
           </section>
 
           <section className="section">
-            <h2>Aylık Girişler</h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2>Aylık Girişler</h2>
+              <span style={{ color: "#555" }}>Toplam: {monthlyTotal}</span>
+            </div>
             <LineChart data={monthlyData} />
           </section>
 
           <section className="section">
-            <h2>En Yoğun Saatler</h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2>En Yoğun Saatler</h2>
+              <span style={{ color: "#555" }}>Toplam: {hourlyTotal}</span>
+            </div>
             <VerticalBars data={hourlyData} />
           </section>
         </>
