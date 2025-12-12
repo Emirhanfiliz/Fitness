@@ -64,7 +64,7 @@ export function RaporlarSayfasi() {
   const hourlyData = useMemo(
     () =>
       (veri?.hourly || []).map((h) => ({
-        label: `${h.hour}:00`,
+        label: `${h.hour}+3:00`,
         value: h.count,
       })),
     [veri]
