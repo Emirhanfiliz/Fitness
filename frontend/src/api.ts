@@ -216,13 +216,17 @@ export async function qrLogin(token: string, email: string, password: string) {
   return res.json() as Promise<{ success: boolean; message: string; member?: any }>;
 }
 
-export async function fetchLoginAnalytics(token: string) {
-  const res = await fetch(`${API_BASE}/admin/analytics/logins`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function fetchLoginAnalytics(token: string, rangeMonths: number) {
+  const res = await fetch(
+    `${API_BASE}/admin/analytics/logins?rangeMonths=${rangeMonths}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   if (!res.ok) throw new Error("Rapor verisi alınamadı");
   return res.json() as Promise<{
-    weekly: { day: string; count: number }[];
+    rangeMonths: number;
+    daily: { day: string; count: number }[];
     monthly: { month: string; count: number }[];
     hourly: { hour: number; count: number }[];
   }>;

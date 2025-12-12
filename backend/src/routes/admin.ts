@@ -87,39 +87,56 @@ adminRouter.get("/dashboard", async (_req, res) => {
   });
 });
 
-adminRouter.get("/analytics/logins", async (_req, res) => {
-  const weekly = await pool.query(`
+adminRouter.get("/analytics/logins", async (req, res) => {
+  const allowed = [1, 3, 6];
+  const rangeMonths = Number(req.query.rangeMonths) || 3;
+  const normalizedRange = allowed.includes(rangeMonths) ? rangeMonths : 3;
+
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - normalizedRange);
+
+  const daily = await pool.query(
+    `
     SELECT
       to_char(olusturma_tarihi, 'YYYY-MM-DD') as day,
       COUNT(*)::int as count
     FROM giris_loglari
-    WHERE olusturma_tarihi >= NOW() - INTERVAL '7 days'
+    WHERE olusturma_tarihi >= $1
     GROUP BY day
     ORDER BY day
-  `);
+  `,
+    [startDate]
+  );
 
-  const monthly = await pool.query(`
+  const monthly = await pool.query(
+    `
     SELECT
       to_char(olusturma_tarihi, 'YYYY-MM') as month,
       COUNT(*)::int as count
     FROM giris_loglari
-    WHERE olusturma_tarihi >= date_trunc('month', NOW()) - INTERVAL '6 months'
+    WHERE olusturma_tarihi >= $1
     GROUP BY month
     ORDER BY month
-  `);
+  `,
+    [startDate]
+  );
 
-  const hourly = await pool.query(`
+  const hourly = await pool.query(
+    `
     SELECT
       EXTRACT(HOUR FROM olusturma_tarihi)::int as hour,
       COUNT(*)::int as count
     FROM giris_loglari
-    WHERE olusturma_tarihi >= NOW() - INTERVAL '30 days'
+    WHERE olusturma_tarihi >= $1
     GROUP BY hour
     ORDER BY hour
-  `);
+  `,
+    [startDate]
+  );
 
   return res.json({
-    weekly: weekly.rows,
+    rangeMonths: normalizedRange,
+    daily: daily.rows,
     monthly: monthly.rows,
     hourly: hourly.rows,
   });
